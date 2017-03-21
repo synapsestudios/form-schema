@@ -7,9 +7,11 @@
   "author": "Synapse Studios, LLC",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint lib/"
+    "lint": "eslint lib/",
+    "test": "jest"
   },
   "devDependencies": {
-    "eslint": "^3.18.0"
+    "eslint": "^3.18.0",
+    "jest": "^19.0.2"
   }
 }
