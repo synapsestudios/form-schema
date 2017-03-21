@@ -13,3 +13,8 @@ test('calling getFormSchema on a new form returns a blank form schema', () => {
     fields: [],
   });
 });
+
+test('calling serialize returns a blank schema as a json string', () => {
+  const formSchema = new FormSchema();
+  expect(formSchema.serialize()).toBe("{\"name\":\"\",\"fields\":[]}");
+});
