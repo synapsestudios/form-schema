@@ -64,4 +64,20 @@ describe('basic usage', () => {
 
     expect(callAddFieldErroneously).toThrow(/name is required/);
   });
+
+  test('calling addField with missing type in object throws an error', () => {
+    function callAddFieldErroneously() {
+      formSchema.addField({ name: 'hi' });
+    }
+
+    expect(callAddFieldErroneously).toThrow(/type is required/);
+  });
+
+  test('calling addField with undefined type throws an error', () => {
+    function callAddFieldErroneously() {
+      formSchema.addField('hi');
+    }
+
+    expect(callAddFieldErroneously).toThrow(/type is required/);
+  });
 });
