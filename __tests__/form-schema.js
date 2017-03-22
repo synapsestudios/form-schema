@@ -27,10 +27,25 @@ describe('basic usage', () => {
   });
 
   test('calling addField adds a field with the correct name and type', () => {
-    formSchema.addField('name', 'text');
+    formSchema.addField('name', 'hidden');
 
     const schema = formSchema.getFormSchema();
     expect(schema.fields[0].name).toBe('name');
-    expect(schema.fields[0].element).toBe('text');
+    expect(schema.fields[0].type).toBe('hidden');
+  });
+
+  test('callingAddField', () => {
+    formSchema.addField({
+      name: 'form name',
+      type: 'text',
+      label: 'Form Name',
+      value: 'Some Value',
+    });
+
+    const schema = formSchema.getFormSchema();
+    expect(schema.fields[0].name).toBe('form name');
+    expect(schema.fields[0].type).toBe('text');
+    expect(schema.fields[0].label).toBe('Form Name');
+    expect(schema.fields[0].value).toBe('Some Value');
   });
 });
