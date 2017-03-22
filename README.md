@@ -3,7 +3,6 @@ A library for building and exporting a form schema that can be used to generate 
 
 # Usage
 
-## addField
 ```
 const FormSchema = require('@synapsestudios/form-schema');
 const formSchema = new FormSchema();
