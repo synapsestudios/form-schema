@@ -34,7 +34,7 @@ describe('basic usage', () => {
     expect(schema.fields[0].type).toBe('hidden');
   });
 
-  test('callingAddField', () => {
+  test('calling AddField with an object', () => {
     formSchema.addField({
       name: 'form name',
       type: 'text',
@@ -47,5 +47,21 @@ describe('basic usage', () => {
     expect(schema.fields[0].type).toBe('text');
     expect(schema.fields[0].label).toBe('Form Name');
     expect(schema.fields[0].value).toBe('Some Value');
+  });
+
+  test('calling addField with missing name in object throws an error', () => {
+    function callAddFieldErroneously() {
+      formSchema.addField({ type: 'hi' });
+    }
+
+    expect(callAddFieldErroneously).toThrow(/name\ is\ required/);
+  });
+
+  test('calling addField with null name throws an error', () => {
+    function callAddFieldErroneously() {
+      formSchema.addField(null);
+    }
+
+    expect(callAddFieldErroneously).toThrow(/name\ is\ required/);
   });
 });
