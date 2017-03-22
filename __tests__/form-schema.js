@@ -54,7 +54,7 @@ describe('basic usage', () => {
       formSchema.addField({ type: 'hi' });
     }
 
-    expect(callAddFieldErroneously).toThrow(/name\ is\ required/);
+    expect(callAddFieldErroneously).toThrow(/name is required/);
   });
 
   test('calling addField with null name throws an error', () => {
@@ -62,6 +62,6 @@ describe('basic usage', () => {
       formSchema.addField(null);
     }
 
-    expect(callAddFieldErroneously).toThrow(/name\ is\ required/);
+    expect(callAddFieldErroneously).toThrow(/name is required/);
   });
 });
