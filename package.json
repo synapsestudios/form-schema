@@ -1,5 +1,5 @@
 {
-  "name": "@synapse/form-schema",
+  "name": "@synapsestudios/form-schema",
   "version": "1.0.0",
   "description": "A package to help create and export form schema for building dynamic forms",
   "main": "lib/index.js",
