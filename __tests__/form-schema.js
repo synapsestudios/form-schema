@@ -27,11 +27,10 @@ describe('basic usage', () => {
       expect(formSchema.serialize()).toBe("{\"name\":\"\",\"fields\":[]}");
     });
 
-    test('calling addField adds a field with the correct name and type', () => {
-      formSchema.addField('name', 'hidden');
+    test('calling addField adds a field with the correct type', () => {
+      formSchema.addField('hidden');
 
       const schema = formSchema.getFormSchema();
-      expect(schema.fields[0].name).toBe('name');
       expect(schema.fields[0].type).toBe('hidden');
     });
 
@@ -50,22 +49,6 @@ describe('basic usage', () => {
       expect(schema.fields[0].value).toBe('Some Value');
     });
 
-    test('calling addField with missing name in object throws an error', () => {
-      function callAddFieldErroneously() {
-        formSchema.addField({ type: 'hi' });
-      }
-
-      expect(callAddFieldErroneously).toThrow(/name is required/);
-    });
-
-    test('calling addField with null name throws an error', () => {
-      function callAddFieldErroneously() {
-        formSchema.addField(null);
-      }
-
-      expect(callAddFieldErroneously).toThrow(/name is required/);
-    });
-
     test('calling addField with missing type in object throws an error', () => {
       function callAddFieldErroneously() {
         formSchema.addField({ name: 'hi' });
@@ -76,7 +59,7 @@ describe('basic usage', () => {
 
     test('calling addField with undefined type throws an error', () => {
       function callAddFieldErroneously() {
-        formSchema.addField('hi');
+        formSchema.addField();
       }
 
       expect(callAddFieldErroneously).toThrow(/type is required/);
@@ -104,13 +87,13 @@ describe('basic usage', () => {
     });
 
     test('calling removeField removes the field', () => {
-      expect(formSchema.removeField('field3')).toBe(true);
+      expect(formSchema.removeField(2)).toBe(true);
       const schema = formSchema.getFormSchema();
       expect(schema.fields[2]).toBeUndefined();
     });
 
     test('calling removeField correctly splices and maintains field order', () => {
-      expect(formSchema.removeField('field2')).toBe(true);
+      expect(formSchema.removeField(1)).toBe(true);
       const schema = formSchema.getFormSchema();
       expect(schema.fields[1]).toEqual({
         name: 'field3',
@@ -119,7 +102,7 @@ describe('basic usage', () => {
     });
 
     test('calling removeField on something that does not exist returns false', () => {
-      expect(formSchema.removeField('hello')).toBe(false);
+      expect(formSchema.removeField(5)).toBe(false);
     });
   });
 
