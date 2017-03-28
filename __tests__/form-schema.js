@@ -15,9 +15,16 @@ describe('basic usage', () => {
       formSchema = new FormSchema();
     });
 
-    test('calling getFormSchema on a new form returns a blank form schema', () => {
+    test('calling getSchemaObject on a new form returns a blank form schema', () => {
 
-      expect(formSchema.getFormSchema()).toEqual({
+      expect(formSchema.getSchemaObject()).toEqual({
+        name: '',
+        fields: [],
+      });
+    });
+
+    test('calling getImmutableSchema to return the schema', () => {
+      expect(formSchema.getImmutableSchema().toJS()).toEqual({
         name: '',
         fields: [],
       });
@@ -30,7 +37,7 @@ describe('basic usage', () => {
     test('calling addField adds a field with the correct type', () => {
       formSchema.addField('hidden');
 
-      const schema = formSchema.getFormSchema();
+      const schema = formSchema.getSchemaObject();
       expect(schema.fields[0].type).toBe('hidden');
     });
 
@@ -42,7 +49,7 @@ describe('basic usage', () => {
         value: 'Some Value',
       });
 
-      const schema = formSchema.getFormSchema();
+      const schema = formSchema.getSchemaObject();
       expect(schema.fields[0].name).toBe('form name');
       expect(schema.fields[0].type).toBe('text');
       expect(schema.fields[0].label).toBe('Form Name');
@@ -88,13 +95,13 @@ describe('basic usage', () => {
 
     test('calling removeField removes the field', () => {
       expect(formSchema.removeField(2)).toBe(true);
-      const schema = formSchema.getFormSchema();
+      const schema = formSchema.getSchemaObject();
       expect(schema.fields[2]).toBeUndefined();
     });
 
     test('calling removeField correctly splices and maintains field order', () => {
       expect(formSchema.removeField(1)).toBe(true);
-      const schema = formSchema.getFormSchema();
+      const schema = formSchema.getSchemaObject();
       expect(schema.fields[1]).toEqual({
         name: 'field3',
         type: 'text',
