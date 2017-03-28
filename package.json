@@ -1,6 +1,6 @@
 {
   "name": "@synapsestudios/form-schema",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A package to help create and export form schema for building dynamic forms",
   "main": "lib/index.js",
   "repository": "https://github.com/synapsestudios/form-schema",
@@ -13,5 +13,8 @@
   "devDependencies": {
     "eslint": "^3.18.0",
     "jest": "^19.0.2"
+  },
+  "dependencies": {
+    "immutable": "^3.8.1"
   }
 }
