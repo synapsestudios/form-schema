@@ -105,6 +105,4 @@ describe('basic usage', () => {
       expect(formSchema.removeField(5)).toBe(false);
     });
   });
-
-
 });
