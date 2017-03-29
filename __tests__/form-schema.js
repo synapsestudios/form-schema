@@ -25,7 +25,12 @@ describe('initialization', () => {
     const formSchema = new FormSchema(testSchema);
     expect(formSchema.getSchemaObject()).toEqual(testSchema);
   });
-  test('support initializing with json string');
+
+  test('support initializing with json string', () => {
+    const jsonSchema = JSON.stringify(testSchema);
+    const formSchema = new FormSchema(jsonSchema);
+    expect(formSchema.getSchemaObject()).toEqual(testSchema);
+  });
 });
 
 describe('basic usage', () => {
