@@ -211,16 +211,7 @@ describe('validation', () => {
         return ['text', 'allowed'];
       },
 
-      text(field) {
-        return new Promise((resolve, reject) => {
-          let errors = [];
-          if (!field.get('label')) {
-            errors.push('label.required');
-          }
-
-          resolve(errors.length ? errors : false);
-        });
-      }
+      text: jest.fn()
     };
   });
 
@@ -252,6 +243,7 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to true when validate is called on valid data', () => {
+    testAdapter.text.mockReturnValue(false);
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'text', label: 'valid'});
 
@@ -261,6 +253,7 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to false when validate is called with invalid field types', () => {
+    testAdapter.text.mockReturnValue(['message']);
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'invalidType', label: 'valid'});
     return formSchema.validate().then(valid => {
@@ -273,7 +266,8 @@ describe('validation', () => {
     formSchema.addField('allowed');
     return formSchema.validate().then(valid => {
       expect(valid).toBe(true);
-    })
+      expect(testAdapter.text.mock.calls.length).toBe(0);
+    });
   });
 
   it('uses the correct validation adapter when calling validate()');
