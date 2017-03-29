@@ -270,7 +270,22 @@ describe('validation', () => {
     });
   });
 
-  it('uses the correct validation adapter when calling validate()');
+  it('uses the correct validation adapter when calling validate()', () => {
+    const newAdapter = Object.assign({}, testAdapter);
+    newAdapter.name = 'newAdapter';
+    newAdapter.text = jest.fn().mockReturnValue(false);
+
+    formSchema.registerValidator(testAdapter);
+    formSchema.registerValidator(newAdapter);
+
+    formSchema.addField('text');
+    formSchema.validate('newAdapter').then(valid => {
+      expect(valid).toBe(true);
+      expect(testAdapter.text.mock.calls.length).toBe(0);
+      expect(newAdapter.text.mock.calls.length).toBe(1);
+    });
+  });
+
   it('returns a promise that resolves to false when validate is called on invalid data');
   it('updates the formSchema object with validation messages when validate is called on invalid data');
   it('does not attempt to validate if no validation adapter is provided');
