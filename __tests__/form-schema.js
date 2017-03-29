@@ -251,7 +251,15 @@ describe('validation', () => {
     expect(formSchema._validators['newAdapter']).toEqual(newAdapter);
   });
 
-  it('returns a promise that resolves to true when validate is called on valid data');
+  it('returns a promise that resolves to true when validate is called on valid data', () => {
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    });
+  });
+
   it('returns a promise that resolves to false when validate is called with invalid field types');
   it('uses the correct validation adapter when calling validate()');
   it('returns a promise that resolves to false when validate is called on invalid data');
