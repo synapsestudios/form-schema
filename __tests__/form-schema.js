@@ -210,8 +210,6 @@ describe('validation', () => {
       getFieldTypes: function() {
         return ['text', 'allowed'];
       },
-
-      text: jest.fn()
     };
   });
 
@@ -243,7 +241,7 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to true when validate is called on valid data', () => {
-    testAdapter.text.mockReturnValue(false);
+    testAdapter.text = jest.fn().mockReturnValue(false);
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'text', label: 'valid'});
 
@@ -253,11 +251,12 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to false when validate is called with invalid field types', () => {
-    testAdapter.text.mockReturnValue(['message']);
+    testAdapter.text = jest.fn();
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'invalidType', label: 'valid'});
     return formSchema.validate().then(valid => {
       expect(valid).toBe(false);
+      expect(testAdapter.text.mock.calls.length).toBe(0);
     });
   });
 
@@ -266,12 +265,12 @@ describe('validation', () => {
     formSchema.addField('allowed');
     return formSchema.validate().then(valid => {
       expect(valid).toBe(true);
-      expect(testAdapter.text.mock.calls.length).toBe(0);
     });
   });
 
   it('uses the correct validation adapter when calling validate()', () => {
     const newAdapter = Object.assign({}, testAdapter);
+    testAdapter.text = jest.fn().mockReturnValue(false);
     newAdapter.name = 'newAdapter';
     newAdapter.text = jest.fn().mockReturnValue(false);
 
@@ -279,14 +278,22 @@ describe('validation', () => {
     formSchema.registerValidator(newAdapter);
 
     formSchema.addField('text');
-    formSchema.validate('newAdapter').then(valid => {
+    return formSchema.validate('newAdapter').then(valid => {
       expect(valid).toBe(true);
       expect(testAdapter.text.mock.calls.length).toBe(0);
       expect(newAdapter.text.mock.calls.length).toBe(1);
     });
   });
 
-  it('returns a promise that resolves to false when validate is called on invalid data');
+  it('returns a promise that resolves to false when validate is called on invalid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('text');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+    });
+  });
+
   it('updates the formSchema object with validation messages when validate is called on invalid data');
   it('does not attempt to validate if no validation adapter is provided');
 });
