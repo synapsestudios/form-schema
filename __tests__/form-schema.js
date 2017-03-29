@@ -1,5 +1,5 @@
 const FormSchema = require('../lib/form-schema');
-
+const Immutable = require('immutable');
 
 describe('initialization', () => {
   test('form initializes without error', () => {
@@ -110,6 +110,58 @@ describe('basic usage', () => {
 
     test('calling removeField on something that does not exist returns false', () => {
       expect(formSchema.removeField(5)).toBe(false);
+    });
+  });
+
+  describe('updating fields', () => {
+    let formSchema;
+    beforeEach(() => {
+      formSchema = new FormSchema();
+      formSchema.addField({
+        name: 'field1',
+        type: 'text',
+      });
+
+      formSchema.addField({
+        name: 'field2',
+        type: 'text',
+      });
+
+      formSchema.addField({
+        name: 'field3',
+        type: 'text',
+      })
+    });
+
+    test('calling updateField updates the field', () => {
+      formSchema.updateField(0, Immutable.Map({
+        name: 'newValue',
+        type: 'text',
+      }));
+
+      const schema = formSchema.getSchemaObject();
+      expect(schema.fields[0]).toEqual({
+        name: 'newValue',
+        type: 'text',
+      });
+    });
+
+    test('calling updateField with inavlid index returns false', () => {
+      expect(formSchema.updateField(100, Immutable.Map({type:'text'}))).toBe(false);
+    });
+
+    test('support calling updateField with a plain javascript', () => {
+      formSchema.updateField(0, {
+        name: 'newValue',
+        type: 'text',
+      });
+
+      const schema = formSchema.getImmutableSchema();
+      expect(schema.getIn(['fields', 0]).toJS()).toEqual({
+        name: 'newValue',
+        type: 'text',
+      });
+      expect(Immutable.Iterable.isIterable(schema.getIn(['fields', 0]))).toBe(true);
     });
   });
 });
