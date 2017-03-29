@@ -31,6 +31,14 @@ describe('initialization', () => {
     const formSchema = new FormSchema(jsonSchema);
     expect(formSchema.getSchemaObject()).toEqual(testSchema);
   });
+
+  test('error is thrown when initializing with invalid json', () => {
+    function initializeErroneously() {
+      new FormSchema('invalid');
+    }
+
+    expect(initializeErroneously).toThrow(/invalid json/);
+  });
 });
 
 describe('basic usage', () => {
