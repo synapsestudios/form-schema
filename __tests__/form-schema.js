@@ -294,6 +294,19 @@ describe('validation', () => {
     });
   });
 
-  it('updates the formSchema object with validation messages when validate is called on invalid data');
+  it('updates the formSchema object with validation messages when validate is called on invalid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('text');
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+      expect(formSchema.getSchemaObject().fields[0]).toEqual({
+        type: 'text',
+        error: ['error'],
+      });
+    });
+  });
+
   it('does not attempt to validate if no validation adapter is provided');
 });
