@@ -2,9 +2,42 @@ const FormSchema = require('../lib/form-schema');
 const Immutable = require('immutable');
 
 describe('initialization', () => {
+  const testSchema = {
+    name: '',
+    fields: [{
+      type: 'text',
+      label: 'Text Field',
+    }]
+  };
+
   test('form initializes without error', () => {
     const formSchema = new FormSchema(); // eslint-disable-line no-unused-vars
     expect(true);
+  });
+
+  test('support initializing with immutable object', () => {
+    const immutableSchema = Immutable.fromJS(testSchema);
+    const formSchema = new FormSchema(immutableSchema);
+    expect(formSchema.getSchemaObject()).toEqual(testSchema);
+  });
+
+  test('support initializing with plain object', () => {
+    const formSchema = new FormSchema(testSchema);
+    expect(formSchema.getSchemaObject()).toEqual(testSchema);
+  });
+
+  test('support initializing with json string', () => {
+    const jsonSchema = JSON.stringify(testSchema);
+    const formSchema = new FormSchema(jsonSchema);
+    expect(formSchema.getSchemaObject()).toEqual(testSchema);
+  });
+
+  test('error is thrown when initializing with invalid json', () => {
+    function initializeErroneously() {
+      new FormSchema('invalid');
+    }
+
+    expect(initializeErroneously).toThrow(/invalid json/);
   });
 });
 
@@ -16,7 +49,6 @@ describe('basic usage', () => {
     });
 
     test('calling getSchemaObject on a new form returns a blank form schema', () => {
-
       expect(formSchema.getSchemaObject()).toEqual({
         name: '',
         fields: [],
@@ -36,12 +68,11 @@ describe('basic usage', () => {
 
     test('calling addField adds a field with the correct type', () => {
       formSchema.addField('hidden');
-
       const schema = formSchema.getSchemaObject();
       expect(schema.fields[0].type).toBe('hidden');
     });
 
-    test('calling AddField with an object', () => {
+    test('calling addField with an object', () => {
       formSchema.addField({
         name: 'form name',
         type: 'text',
