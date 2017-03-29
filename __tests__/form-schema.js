@@ -196,3 +196,44 @@ describe('basic usage', () => {
     });
   });
 });
+
+describe('validation', () => {
+  const testAdapter = {
+    name: 'test',
+
+    getFieldTypes: function() {
+      return ['text'];
+    },
+
+    text(field) {
+      return new Promise((resolve, reject) => {
+        let errors = [];
+        if (!field.get('label')) {
+          errors.push('label.required');
+        }
+
+        resolve(errors.length ? errors : false);
+      });
+    }
+  };
+
+  let formSchema;
+  beforeEach(() => {
+    formSchema = new FormSchema();
+  });
+
+  it('supports registering a validation adapter', () => {
+    formSchema.registerValidator(testAdapter);
+    expect(formSchema._validatorPriority[0]).toEqual(testAdapter);
+    expect(formSchema._validators['test']).toEqual(testAdapter);
+  });
+
+  it('fails when the validation adapter does not provide a name');
+  it('supports adding multiple validation adapters');
+  it('returns a promise that resolves to true when validate is called on valid data');
+  it('returns a promise that resolves to false when validate is called with invalid field types');
+  it('uses the correct validation adapter when calling validate()');
+  it('returns a promise that resolves to false when validate is called on invalid data');
+  it('updates the formSchema object with validation messages when validate is called on invalid data');
+  it('does not attempt to validate if no validation adapter is provided');
+});
