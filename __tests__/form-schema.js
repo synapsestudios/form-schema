@@ -21,7 +21,10 @@ describe('initialization', () => {
     expect(formSchema.getSchemaObject()).toEqual(testSchema);
   });
 
-  test('support initializing with plain object');
+  test('support initializing with plain object', () => {
+    const formSchema = new FormSchema(testSchema);
+    expect(formSchema.getSchemaObject()).toEqual(testSchema);
+  });
   test('support initializing with json string');
 });
 
