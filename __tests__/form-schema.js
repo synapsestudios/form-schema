@@ -228,7 +228,14 @@ describe('validation', () => {
     expect(formSchema._validators['test']).toEqual(testAdapter);
   });
 
-  it('fails when the validation adapter does not provide a name');
+  it('fails when the validation adapter does not provide a name', () => {
+    delete testAdapter.name;
+    const registerErroneously = () => {
+      formSchema.registerValidator(testAdapter);
+    }
+    expect(registerErroneously).toThrow(/name must be provided/);
+  });
+
   it('supports adding multiple validation adapters');
   it('returns a promise that resolves to true when validate is called on valid data');
   it('returns a promise that resolves to false when validate is called with invalid field types');
