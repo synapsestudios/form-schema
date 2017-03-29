@@ -208,7 +208,7 @@ describe('validation', () => {
       name: 'test',
 
       getFieldTypes: function() {
-        return ['text'];
+        return ['text', 'allowed'];
       },
 
       text(field) {
@@ -263,10 +263,17 @@ describe('validation', () => {
   it('returns a promise that resolves to false when validate is called with invalid field types', () => {
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'invalidType', label: 'valid'});
-
     return formSchema.validate().then(valid => {
       expect(valid).toBe(false);
     });
+  });
+
+  it('passes field types when they are allowed but have no validation function', () => {
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('allowed');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    })
   });
 
   it('uses the correct validation adapter when calling validate()');
