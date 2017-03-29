@@ -308,5 +308,10 @@ describe('validation', () => {
     });
   });
 
-  it('does not attempt to validate if no validation adapter is provided');
+  it('does not attempt to validate if no validation adapter is provided', () => {
+    formSchema.addField('text');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    })
+  });
 });
