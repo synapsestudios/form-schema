@@ -198,28 +198,30 @@ describe('basic usage', () => {
 });
 
 describe('validation', () => {
-  const testAdapter = {
-    name: 'test',
-
-    getFieldTypes: function() {
-      return ['text'];
-    },
-
-    text(field) {
-      return new Promise((resolve, reject) => {
-        let errors = [];
-        if (!field.get('label')) {
-          errors.push('label.required');
-        }
-
-        resolve(errors.length ? errors : false);
-      });
-    }
-  };
-
+  let testAdapter;
   let formSchema;
+
   beforeEach(() => {
     formSchema = new FormSchema();
+
+    testAdapter = {
+      name: 'test',
+
+      getFieldTypes: function() {
+        return ['text'];
+      },
+
+      text(field) {
+        return new Promise((resolve, reject) => {
+          let errors = [];
+          if (!field.get('label')) {
+            errors.push('label.required');
+          }
+
+          resolve(errors.length ? errors : false);
+        });
+      }
+    };
   });
 
   it('supports registering a validation adapter', () => {
@@ -236,7 +238,19 @@ describe('validation', () => {
     expect(registerErroneously).toThrow(/name must be provided/);
   });
 
-  it('supports adding multiple validation adapters');
+  it('supports adding multiple validation adapters', () => {
+    const newAdapter = Object.assign({}, testAdapter);
+    newAdapter.name = 'newAdapter';
+
+    formSchema.registerValidator(testAdapter);
+    formSchema.registerValidator(newAdapter);
+
+    expect(formSchema._validatorPriority[0]).toEqual(testAdapter);
+    expect(formSchema._validators['test']).toEqual(testAdapter);
+    expect(formSchema._validatorPriority[1]).toEqual(newAdapter);
+    expect(formSchema._validators['newAdapter']).toEqual(newAdapter);
+  });
+
   it('returns a promise that resolves to true when validate is called on valid data');
   it('returns a promise that resolves to false when validate is called with invalid field types');
   it('uses the correct validation adapter when calling validate()');
