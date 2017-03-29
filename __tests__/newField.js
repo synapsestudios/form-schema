@@ -9,7 +9,7 @@ test('calling with missing type in object throws an error', () => {
   expect(instantiateFieldErroneously).toThrow(/type is required/);
 });
 
-test('calling with missing type in immutable object rhows an error', () => {
+test('calling with missing type in immutable object throws an error', () => {
   function instantiateFieldErroneously() {
     newField(Immutable.Map({ name: 'hi' }));
   }
