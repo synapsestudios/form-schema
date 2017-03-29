@@ -196,3 +196,122 @@ describe('basic usage', () => {
     });
   });
 });
+
+describe('validation', () => {
+  let testAdapter;
+  let formSchema;
+
+  beforeEach(() => {
+    formSchema = new FormSchema();
+
+    testAdapter = {
+      name: 'test',
+
+      getFieldTypes: function() {
+        return ['text', 'allowed'];
+      },
+    };
+  });
+
+  it('supports registering a validation adapter', () => {
+    formSchema.registerValidator(testAdapter);
+    expect(formSchema._validatorPriority[0]).toEqual(testAdapter);
+    expect(formSchema._validators['test']).toEqual(testAdapter);
+  });
+
+  it('fails when the validation adapter does not provide a name', () => {
+    delete testAdapter.name;
+    const registerErroneously = () => {
+      formSchema.registerValidator(testAdapter);
+    }
+    expect(registerErroneously).toThrow(/name must be provided/);
+  });
+
+  it('supports adding multiple validation adapters', () => {
+    const newAdapter = Object.assign({}, testAdapter);
+    newAdapter.name = 'newAdapter';
+
+    formSchema.registerValidator(testAdapter);
+    formSchema.registerValidator(newAdapter);
+
+    expect(formSchema._validatorPriority[0]).toEqual(testAdapter);
+    expect(formSchema._validators['test']).toEqual(testAdapter);
+    expect(formSchema._validatorPriority[1]).toEqual(newAdapter);
+    expect(formSchema._validators['newAdapter']).toEqual(newAdapter);
+  });
+
+  it('returns a promise that resolves to true when validate is called on valid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(false);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    });
+  });
+
+  it('returns a promise that resolves to false when validate is called with invalid field types', () => {
+    testAdapter.text = jest.fn();
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'invalidType', label: 'valid'});
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+      expect(testAdapter.text.mock.calls.length).toBe(0);
+    });
+  });
+
+  it('passes field types when they are allowed but have no validation function', () => {
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('allowed');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    });
+  });
+
+  it('uses the correct validation adapter when calling validate()', () => {
+    const newAdapter = Object.assign({}, testAdapter);
+    testAdapter.text = jest.fn().mockReturnValue(false);
+    newAdapter.name = 'newAdapter';
+    newAdapter.text = jest.fn().mockReturnValue(false);
+
+    formSchema.registerValidator(testAdapter);
+    formSchema.registerValidator(newAdapter);
+
+    formSchema.addField('text');
+    return formSchema.validate('newAdapter').then(valid => {
+      expect(valid).toBe(true);
+      expect(testAdapter.text.mock.calls.length).toBe(0);
+      expect(newAdapter.text.mock.calls.length).toBe(1);
+    });
+  });
+
+  it('returns a promise that resolves to false when validate is called on invalid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('text');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+    });
+  });
+
+  it('updates the formSchema object with validation messages when validate is called on invalid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('text');
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+      expect(formSchema.getSchemaObject().fields[0]).toEqual({
+        type: 'text',
+        error: ['error'],
+      });
+    });
+  });
+
+  it('does not attempt to validate if no validation adapter is provided', () => {
+    formSchema.addField('text');
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    })
+  });
+});
