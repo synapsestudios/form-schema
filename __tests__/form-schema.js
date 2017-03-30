@@ -241,12 +241,32 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to true when validate is called on valid data', () => {
+    testAdapter.text = jest.fn().mockReturnValue(Promise.resolve(false));
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    });
+  });
+
+  it('supports synchronous validators when they pass', () => {
     testAdapter.text = jest.fn().mockReturnValue(false);
     formSchema.registerValidator(testAdapter);
     formSchema.addField({type: 'text', label: 'valid'});
 
     return formSchema.validate().then(valid => {
       expect(valid).toBe(true);
+    });
+  });
+
+  it('supports synchronous validators when they fail', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['an error message']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
     });
   });
 
@@ -270,9 +290,9 @@ describe('validation', () => {
 
   it('uses the correct validation adapter when calling validate()', () => {
     const newAdapter = Object.assign({}, testAdapter);
-    testAdapter.text = jest.fn().mockReturnValue(false);
+    testAdapter.text = jest.fn().mockReturnValue(Promise.resolve(false));
     newAdapter.name = 'newAdapter';
-    newAdapter.text = jest.fn().mockReturnValue(false);
+    newAdapter.text = jest.fn().mockReturnValue(Promise.resolve(false));
 
     formSchema.registerValidator(testAdapter);
     formSchema.registerValidator(newAdapter);
@@ -286,7 +306,7 @@ describe('validation', () => {
   });
 
   it('returns a promise that resolves to false when validate is called on invalid data', () => {
-    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    testAdapter.text = jest.fn().mockReturnValue(Promise.resolve(['error']));
     formSchema.registerValidator(testAdapter);
     formSchema.addField('text');
     return formSchema.validate().then(valid => {
@@ -295,7 +315,7 @@ describe('validation', () => {
   });
 
   it('updates the formSchema object with validation messages when validate is called on invalid data', () => {
-    testAdapter.text = jest.fn().mockReturnValue(['error']);
+    testAdapter.text = jest.fn().mockReturnValue(Promise.resolve(['error']));
     formSchema.registerValidator(testAdapter);
     formSchema.addField('text');
 
