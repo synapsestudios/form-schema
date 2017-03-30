@@ -250,6 +250,26 @@ describe('validation', () => {
     });
   });
 
+  it('supports synchronous validators when they pass', () => {
+    testAdapter.text = jest.fn().mockReturnValue(false);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(true);
+    });
+  });
+
+  it('supports synchronous validators when they fail', () => {
+    testAdapter.text = jest.fn().mockReturnValue(['an error message']);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', label: 'valid'});
+
+    return formSchema.validate().then(valid => {
+      expect(valid).toBe(false);
+    });
+  });
+
   it('returns a promise that resolves to false when validate is called with invalid field types', () => {
     testAdapter.text = jest.fn();
     formSchema.registerValidator(testAdapter);
