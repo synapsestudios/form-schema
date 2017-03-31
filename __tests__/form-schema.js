@@ -334,4 +334,15 @@ describe('validation', () => {
       expect(valid).toBe(true);
     })
   });
+
+  it(`allows validators to use the 'this' key word as expected`, () => {
+    testAdapter.text = jest.fn().mockReturnValue(false);
+
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField('text');
+    return formSchema.validate().then(isValid => {
+      expect(isValid).toBe(true);
+      expect(testAdapter.text.mock.instances.length).toBe(1);
+    });
+  });
 });
