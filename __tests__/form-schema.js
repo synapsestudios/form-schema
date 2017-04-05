@@ -1,4 +1,4 @@
-const FormSchema = require('../lib/form-schema');
+const FormSchema = require('../src/form-schema');
 const Immutable = require('immutable');
 
 describe('initialization', () => {
