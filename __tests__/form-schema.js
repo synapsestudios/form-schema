@@ -345,4 +345,20 @@ describe('validation', () => {
       expect(testAdapter.text.mock.instances.length).toBe(1);
     });
   });
+
+  it(`sets error key to false fields that are valid`, () => {
+    testAdapter.text = jest.fn().mockReturnValue(false);
+    formSchema.registerValidator(testAdapter);
+    formSchema.addField({type: 'text', error: ['error message']});
+
+    return formSchema.validate().then(isValid => {
+      expect(isValid).toBe(true);
+      expect(formSchema.getSchemaObject()).toEqual({
+        name: '',
+        fields: [
+          { type: 'text', error: false }
+        ],
+      });
+    });
+  });
 });
