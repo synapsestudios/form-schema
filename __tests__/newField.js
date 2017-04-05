@@ -1,4 +1,4 @@
-const newField = require('../lib/newField');
+const newField = require('../src/newField');
 const Immutable = require('immutable');
 
 test('calling with missing type in object throws an error', () => {
