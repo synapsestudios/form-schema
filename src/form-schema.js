@@ -1,5 +1,6 @@
 const newField = require('./newField');
 const Immutable = require('immutable');
+const isEqual = require('lodash.isequal');
 
 const FormSchema = function(schema) {
   this._validatorPriority = [];
@@ -26,10 +27,12 @@ FormSchema.prototype._initialize = function(schema) {
   // if schema is not immutable, make it immutable
   schema = Immutable.Iterable.isIterable(schema) ? schema : Immutable.fromJS(schema);
 
-  this._form.set('name', schema.get('name'));
-  schema.get('fields').forEach(field => {
-    this.addField(field);
-  });
+  this._form = this._form.set('name', schema.get('name'));
+  if (schema.get('fields')) {
+    schema.get('fields').forEach(field => {
+      this.addField(field);
+    });
+  }
 }
 
 FormSchema.prototype.getSchemaObject = function() {
@@ -118,6 +121,48 @@ FormSchema.prototype.validate = function(validatorName) {
   } else {
     return Promise.resolve(true);
   }
+}
+
+/**
+ * Check if the given form schema matches this instances schema
+ *
+ * Schemas match when the form has the same name, the same number of fields,
+ * the fields are in the same order, and each field object is the same.
+ *
+ * The one exception is that if a field has a "value" key this DOES NOT enforce
+ * that the field values match.
+ */
+FormSchema.prototype.doesSchemaMatch = function(formSchema) {
+  let isMatch = true;
+
+  if (!Immutable.is(this.getImmutableSchema(), formSchema.getImmutableSchema())) {
+    // do the real work
+    const ownSchema = this.getSchemaObject();
+    const theirSchema = formSchema.getSchemaObject();
+
+    if (ownSchema.name !== theirSchema.name) {
+      isMatch = false;
+    }
+
+    if (isMatch && ownSchema.fields.length !== theirSchema.fields.length) {
+      isMatch = false;
+    }
+
+    if (isMatch) {
+      let i = 0;
+      for (i; i < ownSchema.fields.length && isMatch; i++) {
+        const ownField = ownSchema.fields[i];
+        const theirField = theirSchema.fields[i];
+
+        delete ownField.value;
+        delete theirField.value;
+
+        isMatch = isEqual(ownField, theirField);
+      }
+    }
+  }
+
+  return isMatch;
 }
 
 module.exports = FormSchema;

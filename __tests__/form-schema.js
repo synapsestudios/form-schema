@@ -39,6 +39,11 @@ describe('initialization', () => {
 
     expect(initializeErroneously).toThrow(/invalid json/);
   });
+
+  test('does not fail when initializing name without fields', () => {
+    const formSchema = new FormSchema({name: 'test-form'});
+    expect(formSchema.getSchemaObject()).toEqual({name: 'test-form', fields: []});
+  });
 });
 
 describe('basic usage', () => {
@@ -360,5 +365,73 @@ describe('validation', () => {
         ],
       });
     });
+  });
+});
+
+describe('doesSchemaMatch', () => {
+  let formSchemaOne;
+  let formSchemaTwo;
+
+  beforeEach(() => {
+    formSchemaOne = new FormSchema({name: 'form-schema-one'});
+    formSchemaTwo = new FormSchema({name: 'form-schema-two'});
+  });
+
+  it('returns false when form names are different', () => {
+    expect(formSchemaOne.doesSchemaMatch(formSchemaTwo)).toBe(false);
+  });
+
+  it('returns false when field count is not the same', () => {
+    const newSchema = new FormSchema(formSchemaOne.getSchemaObject());
+
+    newSchema.addField({type: 'hello', value: 'some value'});
+    formSchemaOne.addField({type: 'hello', value: 'some value'});
+    formSchemaOne.addField({type: 'hello', value: 'some other value'});
+
+    expect(formSchemaOne.doesSchemaMatch(newSchema)).toBe(false);
+  });
+
+  it('returns false when fields are not the same', () => {
+    const newSchema = new FormSchema(formSchemaOne.getSchemaObject());
+
+    newSchema.addField({type: 'text', value: 'some value'});
+    formSchemaOne.addField({type: 'number', value: '1'});
+
+    expect(formSchemaOne.doesSchemaMatch(newSchema)).toBe(false);
+  });
+
+  it('returns false when fields are the same but in different order', () => {
+    const newSchema = new FormSchema(formSchemaOne.getSchemaObject());
+
+    newSchema.addField({type: 'text', value: 'some value'});
+    newSchema.addField({type: 'number', value: '1'});
+    formSchemaOne.addField({type: 'number', value: '1'});
+    formSchemaOne.addField({type: 'text', value: 'some value'});
+
+    expect(formSchemaOne.doesSchemaMatch(newSchema)).toBe(false);
+  });
+
+  it('returns true when fields are the same', () => {
+    const newFormSchema = new FormSchema(formSchemaOne.getSchemaObject());
+    expect(formSchemaOne.doesSchemaMatch(newFormSchema)).toBe(true);
+  });
+
+  it('returns true when fields are the same even if \'value\' key is different', () => {
+    const newFormSchema = new FormSchema({
+      name: 'form-schema-one',
+      fields: [
+        {
+          type: 'hello',
+          value: 'test value',
+        }
+      ]
+    });
+
+    formSchemaOne.addField({
+      type: 'hello',
+      value: 'some other test value',
+    });
+
+    expect(formSchemaOne.doesSchemaMatch(newFormSchema)).toBe(true);
   });
 });
