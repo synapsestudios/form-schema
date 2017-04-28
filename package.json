@@ -20,6 +20,7 @@
     "jest": "^19.0.2"
   },
   "dependencies": {
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "lodash.isequal": "^4.5.0"
   }
 }
