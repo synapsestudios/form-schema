@@ -39,6 +39,11 @@ describe('initialization', () => {
 
     expect(initializeErroneously).toThrow(/invalid json/);
   });
+
+  test('does not fail when initializing name without fields', () => {
+    const formSchema = new FormSchema({name: 'test-form'});
+    expect(formSchema.getSchemaObject()).toEqual({name: 'test-form', fields: []});
+  });
 });
 
 describe('basic usage', () => {
@@ -361,4 +366,24 @@ describe('validation', () => {
       });
     });
   });
+});
+
+describe('isSchemaMatch', () => {
+  let formSchemaOne;
+  let formSchemaTwo;
+
+  beforeEach(() => {
+    formSchemaOne = new FormSchema({name: 'form-schema-one'});
+    formSchemaTwo = new FormSchema({name: 'form-schema-two'});
+  });
+
+  it('returns false when form names are different', () => {
+    expect(formSchemaOne.isSchemaMatch(formSchemaTwo)).toBeFalsy();
+  });
+
+  it('returns false when field count is not the same');
+  it('returns false when fields are not the same');
+  it('returns false when fields are the same but in different order');
+  it('returns true when fields are the same');
+  it('returns true when fields are the same even if \'value\' key is different');
 });

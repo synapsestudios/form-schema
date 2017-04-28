@@ -26,10 +26,12 @@ FormSchema.prototype._initialize = function(schema) {
   // if schema is not immutable, make it immutable
   schema = Immutable.Iterable.isIterable(schema) ? schema : Immutable.fromJS(schema);
 
-  this._form.set('name', schema.get('name'));
-  schema.get('fields').forEach(field => {
-    this.addField(field);
-  });
+  this._form = this._form.set('name', schema.get('name'));
+  if (schema.get('fields')) {
+    schema.get('fields').forEach(field => {
+      this.addField(field);
+    });
+  }
 }
 
 FormSchema.prototype.getSchemaObject = function() {
@@ -118,6 +120,10 @@ FormSchema.prototype.validate = function(validatorName) {
   } else {
     return Promise.resolve(true);
   }
+}
+
+FormSchema.prototype.isSchemaMatch = function(formSchema) {
+  return false;
 }
 
 module.exports = FormSchema;
